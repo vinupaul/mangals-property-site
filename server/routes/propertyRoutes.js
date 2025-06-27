@@ -26,4 +26,29 @@ router.post('/', async (req, res) => {
   }
 });
 
+// DELETE a property
+router.delete('/:id', async (req, res) => {
+    try {
+      await Property.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Property deleted' });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to delete property' });
+    }
+  });
+  
+  // UPDATE a property
+  router.put('/:id', async (req, res) => {
+    try {
+      const updated = await Property.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+      );
+      res.json(updated);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update property' });
+    }
+  });
+
+  
 module.exports = router;
