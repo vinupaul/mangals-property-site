@@ -1,10 +1,13 @@
 import AddProperty from './pages/AddProperty';
 import PropertyList from './pages/PropertyList';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" />
       <nav className="p-4 bg-gray-800 text-white flex justify-between">
         <Link to="/">Home</Link>
         <Link to="/add">Add Property</Link>
