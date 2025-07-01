@@ -32,32 +32,41 @@ function PropertyList() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-center">Property Listings</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Property Listings</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {Array.isArray(properties) && properties.map((property, index) => (
-          <div key={index} className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden border relative">
-            {/* Image Placeholder */}
-            <div className="bg-gray-200 h-40 flex items-center justify-center text-gray-500">
-              <span>No Image</span>
-            </div>
+          <div
+            key={index}
+            className="relative bg-white rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1"
+          >
+            {/* Property Image */}
+            <div className="h-48 bg-gray-300 overflow-hidden rounded-t-lg relative">
+              <img
+                src={property.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'}
+                alt={property.title}
+                className="w-full h-full object-cover"
+              />
 
-            {/* Property Info */}
-            <div className="p-4">
-              <h2 className="text-xl font-semibold">{property.title}</h2>
-              <p className="text-gray-600">{property.location}</p>
-              <div className="flex justify-between items-center mt-3">
-                <p className="text-green-600 font-bold">${Number(property.price).toLocaleString()}</p>
-                <span className={`px-3 py-1 text-sm rounded-full text-white ${property.type === 'rent' ? 'bg-blue-500' : 'bg-green-500'}`}>
+              {/* Overlay Badge + Price */}
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent text-white p-3 flex justify-between items-center">
+                <span className="text-sm font-semibold">${Number(property.price).toLocaleString()}</span>
+                <span className={`px-2 py-1 text-xs rounded ${property.type === 'rent' ? 'bg-blue-500' : 'bg-green-500'}`}>
                   {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
                 </span>
               </div>
             </div>
 
-            {/* 🗑️ Delete Button */}
+            {/* Property Info */}
+            <div className="p-4">
+              <h2 className="text-lg font-bold text-gray-800">{property.title}</h2>
+              <p className="text-sm text-gray-600 mt-1">{property.location}</p>
+            </div>
+
+            {/* Delete Button */}
             <button
               onClick={() => handleDelete(property._id)}
-              className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+              className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
             >
               Delete
             </button>
