@@ -18,7 +18,7 @@ const AddProperty = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
@@ -40,23 +40,13 @@ const AddProperty = () => {
 
     try {
       await axios.post('http://localhost:5000/api/properties', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      toast.success('✅ Property added successfully!');
-      setFormData({
-        title: '',
-        location: '',
-        price: '',
-        type: 'rent',
-        description: '',
-      });
-      setImage(null);
+      toast.success('✅ Property added!');
       setTimeout(() => navigate('/'), 1500);
-    } catch (error) {
-      console.error('Failed to add property:', error);
+    } catch (err) {
+      console.error(err);
       toast.error('❌ Failed to add property');
     }
   };
@@ -72,10 +62,11 @@ const AddProperty = () => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
             required
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Location</label>
           <input
@@ -83,21 +74,23 @@ const AddProperty = () => {
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
             required
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
+
         <div>
-          <label className="block mb-1 font-medium">Price</label>
+          <label className="block mb-1 font-medium">Price ($)</label>
           <input
             type="number"
             name="price"
             value={formData.price}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
             required
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Type</label>
           <select
@@ -110,16 +103,18 @@ const AddProperty = () => {
             <option value="sale">Sale</option>
           </select>
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Description</label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
             rows="3"
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Image</label>
           <input
@@ -130,6 +125,7 @@ const AddProperty = () => {
             className="w-full"
           />
         </div>
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
