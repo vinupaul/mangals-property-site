@@ -6,6 +6,7 @@ require('dotenv').config();
 const propertyRoutes = require('./routes/propertyRoutes');
 
 const app = express();
+app.use('/uploads', express.static('uploads'));
 app.use(cors());
 app.use(express.json());
 

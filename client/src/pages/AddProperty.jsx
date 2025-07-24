@@ -9,9 +9,9 @@ const AddProperty = () => {
     location: '',
     price: '',
     type: 'rent',
-    description: '',
+    description: ''
   });
-
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,17 +21,26 @@ const AddProperty = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.post('http://localhost:5000/api/properties', formData);
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+      if (image) data.append('image', image);
+
+      await axios.post('http://localhost:5000/api/properties', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
       toast.success('✅ Property added successfully!');
       setFormData({ title: '', location: '', price: '', type: 'rent', description: '' });
+      setImage(null);
 
-      setTimeout(() => {
-        navigate('/');  // 🎯 Redirect after toast
-      }, 1500);
+      setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       console.error('Failed to add property:', error);
       toast.error('❌ Failed to add property');
@@ -41,23 +50,20 @@ const AddProperty = () => {
   return (
     <div className="max-w-xl mx-auto p-6 bg-white shadow rounded mt-10">
       <h2 className="text-2xl font-bold mb-4">Add New Property</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
         <div>
           <label className="block mb-1 font-medium">Title</label>
-          <input type="text" name="title" required
-            value={formData.title} onChange={handleChange}
+          <input type="text" name="title" required value={formData.title} onChange={handleChange}
             className="w-full border px-3 py-2 rounded" />
         </div>
         <div>
           <label className="block mb-1 font-medium">Location</label>
-          <input type="text" name="location" required
-            value={formData.location} onChange={handleChange}
+          <input type="text" name="location" required value={formData.location} onChange={handleChange}
             className="w-full border px-3 py-2 rounded" />
         </div>
         <div>
           <label className="block mb-1 font-medium">Price</label>
-          <input type="number" name="price" required
-            value={formData.price} onChange={handleChange}
+          <input type="number" name="price" required value={formData.price} onChange={handleChange}
             className="w-full border px-3 py-2 rounded" />
         </div>
         <div>
@@ -70,9 +76,13 @@ const AddProperty = () => {
         </div>
         <div>
           <label className="block mb-1 font-medium">Description</label>
-          <textarea name="description"
-            value={formData.description} onChange={handleChange}
-            className="w-full border px-3 py-2 rounded" rows="3" />
+          <textarea name="description" value={formData.description} onChange={handleChange} rows="3"
+            className="w-full border px-3 py-2 rounded" />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Image</label>
+          <input type="file" accept="image/*" onChange={handleImageChange}
+            className="w-full border px-3 py-2 rounded bg-white" />
         </div>
         <button type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

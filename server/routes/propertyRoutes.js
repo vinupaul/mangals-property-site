@@ -50,5 +50,44 @@ router.delete('/:id', async (req, res) => {
     }
   });
 
+  const multer = require('multer');  
+  // Configure multer storage
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname);
+    }
+  });
   
+  const upload = multer({ storage });
+  
+  // Route to create a new property with image upload
+  router.post('/', upload.single('image'), async (req, res) => {
+    const { title, location, price, type, description } = req.body;
+  
+    // ✅ Required field check
+    if (!title || !location || !price || !type) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+  
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+  
+    const newProperty = new Property({
+      title,
+      location,
+      price,
+      type,
+      description,
+      imageUrl,
+    });
+  
+    try {
+      await newProperty.save();
+      res.status(201).json(newProperty);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 module.exports = router;
