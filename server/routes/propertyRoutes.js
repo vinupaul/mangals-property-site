@@ -1,8 +1,49 @@
+// routes/propertyRoutes.js
+
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const Property = require('../models/Property');
 
-// GET all properties
+// Configure multer to store files in /uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
+// ✅ Create new property with image upload
+router.post('/', upload.single('image'), async (req, res) => {
+  try {
+    const { title, location, price, type, description } = req.body;
+
+    if (!title || !location || !price || !type) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const newProperty = new Property({
+      title,
+      location,
+      price,
+      type,
+      description,
+      imageUrl: req.file ? `/uploads/${req.file.filename}` : ''
+    });
+
+    await newProperty.save();
+    res.status(201).json(newProperty);
+  } catch (err) {
+    console.error('Error saving property:', err);
+    res.status(500).json({ error: 'Failed to save property' });
+  }
+});
+
+// Other CRUD routes
 router.get('/', async (req, res) => {
   try {
     const properties = await Property.find();
@@ -12,82 +53,22 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new property
-router.post('/', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    console.log('Received POST:', req.body);
-
-    const newProperty = new Property(req.body);
-    await newProperty.save();
-    res.status(201).json(newProperty);
+    await Property.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Property deleted' });
   } catch (err) {
-    console.error('Error saving property:', err);
-    res.status(400).json({ error: 'Failed to add property' });
+    res.status(500).json({ error: 'Failed to delete property' });
   }
 });
 
-// DELETE a property
-router.delete('/:id', async (req, res) => {
-    try {
-      await Property.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Property deleted' });
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to delete property' });
-    }
-  });
-  
-  // UPDATE a property
-  router.put('/:id', async (req, res) => {
-    try {
-      const updated = await Property.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-      );
-      res.json(updated);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to update property' });
-    }
-  });
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update property' });
+  }
+});
 
-  const multer = require('multer');  
-  // Configure multer storage
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname);
-    }
-  });
-  
-  const upload = multer({ storage });
-  
-  // Route to create a new property with image upload
-  router.post('/', upload.single('image'), async (req, res) => {
-    const { title, location, price, type, description } = req.body;
-  
-    // ✅ Required field check
-    if (!title || !location || !price || !type) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-  
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
-  
-    const newProperty = new Property({
-      title,
-      location,
-      price,
-      type,
-      description,
-      imageUrl,
-    });
-  
-    try {
-      await newProperty.save();
-      res.status(201).json(newProperty);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  });
 module.exports = router;
